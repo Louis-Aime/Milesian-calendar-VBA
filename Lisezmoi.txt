@@ -1,0 +1,88 @@
+Package Milesian Basic for Excel - M2017-06-15
+
+Modules permettant des actions en langage VBA pour Excel. 
+
+Source rédigé en anglais.
+Auteur: Miletus SARL 2017 (www.calendriermilesien.org).
+Transformation et adpatation sous réserve de citation de l'auteur.
+Intégration possible dans une offre ou sur un support, sous réserve de citation de l'auteur et du site.
+Testé sur Excel 2016 français. Réputé fonctionner sur Excel 2007 et supérieur sans sensibilité de langage.
+Fonctionnement en Date1904 vérifié sur plate-forme Windows - à vérifier sur Mac OS
+
+Mise en service:
+1. Créez un fichier Excel, sauvegardez-le avec le type "Fichier Excel prenant en charge les macros".
+2. Si vous ne voyez pas le menu "Développeur", validez l'accès à ce menu dans vos options.
+3. Dans le menu "Développeur", choisissez "Visual Basic" à l'extrême gauche.
+4. Une feuille Visual Basic s'ouvre. Dans le menu "Fichier" de cette feuille, choisissez "Importer un fichier".
+5. Importez les fichiers nnn.bas que vous souhaitez utilisez. Il n'y a pas d'inconvénients à les importer tous.
+6. Après import, les modules correspondant aux fichiers importés sont visibles. Vous pouvez consulter le code, qui est commenté.
+7. Retournez dans votre feuille Excel avec la commande "Fermer et retourner dans Excel" du menu "Fichier" de la feuille Visual Basic.
+8. Dans votre fichier Excel, vous pouvez appeler les fonctions des modules créés.
+
+Utilisation des fonctions:
+Vous pouvez retrouver les fonctions importées en cliquant le bouton "Insérer une fonction" de la barre de saisie.
+- Sélectionnez la catégorie "Personnalisées".
+- Les fonctions apparaissent.
+- Si vous choisissez une fonction, la liste des variables apparaît (sans aide dans la version actuelle).
+Les fonctions sont sensibles à l'option avancée "Calendrier depuis 1904" positionnée par défaut dans la version MacOS de MS Excel et modifiable.
+
+Architecture des modules:
+	MilesianCalendar: Lire et décomposer une date en milésien, et créer une date à partir des coordonnées jour, mois, année en milésien.
+	MilesianMoon: Calculs de lune
+
+Les modules sont indépendants l'un de l'autre
+
+Les fonctions utilisables et leurs paramètres, par module:
+
+
+#MilesianCalendar
+
+MILESIAN_IS_LONG_YEAR: Booléeen, indique si l'année milésienne est abdondante. Une année milésienne abondante est une année qui précède une année bissextile. La règle d'intercalation milésienne est appliquée, donc les années: -4001, -801, 2399, 5599 etc. sont non abondantes. 
+A part ces cas, ce sont les règles grégoriennes qui s'appliquent
+	Paramètre: Y, année dont on cherche à déterminer le type
+
+Les autres fonctions sont analogues à des fonctions de la catégorie "Date et heure" d'Excel.
+Les dates calculées en option ordinaires peuvent être des nombres négatifs, le minimum correspondant au 1/1/100 grégorien. 
+Ces dates antérieures à 1900 ne sont pas affichées par Excel, mais on peut les gérer et notamment les afficher en milésien.
+Ceci n'est toutefois possible, sous Excel Windows, que si l'option Date1904 est décochée. Avec l'option cochée, les dates antérieurs à 1/1/1904 provoquent une erreur.
+
+MILESIAN_DATE: Date Excel correspondant à une date milésienne dont les éléments sont donnés en paramètres. Résultat (affiché) entre 1/1/1900 et 31/12/9999. 
+Les deux premiers mois de 1900 affichés en grégoriens sont faux (erreur Microsoft connue)
+La date est entière, l'heure est 00h.
+	Paramètres: Year: Année milésienne (>=100, comptée dans l'ère commune) Month: numéro du mois (1 à 12) DayInMonth: Quantième dans le mois (1-31)
+	Si le triplet ne correspond pas à une date valide, la fonction retourne une erreur.
+
+MILESIAN_YEAR_BASE: Date Excel correspondant à la base d'une année c'est à dire le jour précédent le 1 1m de l'année. Résultat entre 20/1/1900 et une date en 9999. 
+	
+MILESIAN_YEAR: Année milésienne d'une date Excel (Minimum 100 en version non Date1904, minimum 1904 en version Date1904)
+	Paramètres: ExcelDate: date Excel, qui peut être une date et heure: seule la date est considérée.
+
+MILESIAN_MONTH: Numéro de mois milésien d'une date Excel (1 à 12)
+	Paramètres: ExcelDate: date Excel, qui peut être une date et heure: seule la date est considérée
+
+MILESIAN_DAY: Quantième dans le mois milésien d'une date Excel (1-31)
+	Paramètres: ExcelDate: date Excel, qui peut être une date et heure: seule la date est considérée
+
+MILESIAN_DISPLAY: Une chaîne de caractères exprimant la date milésienne d'une date Excel
+	Paramètres: ExcelDate: date Excel, qui peut être une date et heure: seule la date est considérée
+
+MILESIAN_MONTH_END: Date de fin de mois milésien, n mois avant ou après une date donnée. Même fonctionnement que la fonction FIN.MOIS (qui cherche une fin de mois grégorien)
+
+MILESIAN_MONTH_SHIFT: Date de même quantième, n mois avant ou après une date donnée. Même fonctionnement que MOIS.DECALER.
+
+
+#MilesianMoon
+
+Calcul de dernière ou de prochaine lune. Marge d'erreur de 6 heures pour +/- 3000 ans à partir de l'an 2000 (en réalité on ne peut calculer avant l'an 100).
+
+LastMoonPhase: La date de la dernière nouvelle lune, ou de la dernière phase lunaire spécifiée.
+	L'horodatage est en heure TT, très proche de l'heure UTC à nos époques.
+	Le calcul est fondée sur une lune moyenne linéaire (non corrigée). La nouvelle lune moyenne de référence est la première de l'an 2000.
+	Paramètres: FromDate: jour auquel on se réfère ; MoonPhase (=0 si non présent): 0=nouvelle lune, 1=premier quartier, 2=pleine lune, 3=dernier quartier, 
+		erreur pour toute autre valeur de MoonPhase.
+
+NextMoonPhase: Le date de la prochaine nouvelle lune, ou de la prochaine phase lunaire spécifiée.
+	L'horodatage est en heure TT, très proche de l'heure UTC à nos époques.
+	Le calcul est fondée sur une lune moyenne linéaire (non corrigée). La nouvelle lune moyenne de référence est la première de l'an 2000.
+	Paramètres: FromDate: jour auquel on se réfère ; MoonPhase (=0 si non présent): 0=nouvelle lune, 1=premier quartier, 2=pleine lune, 3=dernier quartier, 
+		erreur pour toute autre valeur de MoonPhase.
