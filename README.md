@@ -26,23 +26,28 @@ MAC OS users: check date conversion starting from 1904.
 ## MilesianCalendar
 Compute a system date with Milesian date elements, or retrieve Milesian date elements from a system date.
 ### MILESIAN_IS_LONG_YEAR (Y)
-* Y, the year in question
-Boolean, whether the year is long (366 days) or not. A long Milesian year is just before a leap year, 
-e.g. 2015 is a long year because 2016 is a leap year. With the Milesian calendar, a proposed rule is this:
+Boolean, whether the year is long (366 days) or not. 
+* Y, the year in question.
+
+A long Milesian year is just before a leap year, e.g. 2015 is a long year because 2016 is a leap year. 
+With the Milesian calendar, a proposed rule is this:
 years -4001, -801, 2399, 5599 etc. are *not* long. Elsewise the Gregorian rules are applied, 
 e.g. 1899 is *not* long whereas 1999 is.
-Remember that by mistake, 1/1/1900 to 29/2/1900 are wrong under Microsoft.
+Remember that by mistake, dates 1/1/1900 to 29/2/1900 are wrong under Microsoft Windows.
+
+### MILESIAN_YEAR_BASE (Y) 
+Date of the day before the 1 1m of year Y, i.e. the "doomsday".
 
 ### Other functions of this module 
 They work like the standard date-time functions of Excel. 
 Under Microsoft (1900-calendar), negative results are handled. Excel does not display those date.
 The minimum negative value is around (julian) January of year 100. 
 Under MacOS, no date before 1 Jan 1904 can be handled.
-* MILESIAN_YEAR_BASE (Y): the day before the 1 1m of year Y, the "doomsday".
+
 * MILESIAN_YEAR, MILESIAN_MONTH, MILESIAN_DAY: the Milesian date elements of an Excel date-time stamp.
 * MILESIAN_DISPLAY (D) : a string that expresses a date in Milesian.
 * MILESIAN_MONTH_END : works like MONTH.END.
-* MILESIAN_MONTH-SHIFT : works like MONTH.SHIFT.
+* MILESIAN_MONTH_SHIFT : works like MONTH.SHIFT.
 
 ## Milesian moon
 Next or last mean moon. Error is +/- 6 hours for +/- 3000 years from year 2000.
