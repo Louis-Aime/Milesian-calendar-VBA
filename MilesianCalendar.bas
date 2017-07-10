@@ -8,7 +8,7 @@ Attribute VB_Name = "MilesianCalendar"
 'May be used for personal or professional purposes.
 'If transmitted or integrated, even with changes, present header shall be maintained in full.
 'Functions are aimed at extending Date & Time functions, and use similar parameters syntax in English
-'Version V1.0 M2017-06-15
+'Version V1.1 M2017-07-19
 '
 Const MStoPresentEra As Long = 986163 'Offset between 1/1m/-800 epoch and Microsoft origin (1899-12-31T00 is 1)
 Const DayOffsetMacOS As Long = 1462
@@ -155,7 +155,7 @@ Milesian_DateElement ExcelDate, Y, M, Q   'Compute the 3 figures of the milesian
 MILESIAN_DISPLAY = Q & " " & M & "m " & Y
 End Function
 '#Part 5: Computations on milesian months
-Function MILESIAN_MONTH_SHIFT(ExcelDate As Date, MonthShift As Long) As Date 'Same date several (milesian) month later of earlier
+Function MILESIAN_MONTH_SHIFT(ExcelDate As Date, MonthShift As Long) As Date 'Same date several (milesian) months later of earlier
 Dim Y As Integer, M As Integer, Q As Integer
 Dim M1 As Long, Cycle As Long, Phase As Long
 'Compute begin milesian date
@@ -172,7 +172,7 @@ M = Phase + 1
 If (Q = 31) And (((M Mod 2) = 1) Or ((M = 12) And Not MILESIAN_IS_LONG_YEAR(Y))) Then Q = 30
 MILESIAN_MONTH_SHIFT = MILESIAN_DATE(Y, M, Q)
 End Function
-Function MILESIAN_MONTH_END(ExcelDate As Date, MonthShift As Long) As Date 'End of month several (milesian) month later of earlier
+Function MILESIAN_MONTH_END(ExcelDate As Date, MonthShift As Long) As Date 'End of month several (milesian) months later of earlier
 Dim Y As Integer, M As Integer, Q As Integer
 Dim M1 As Long, Cycle As Long, Phase As Long
 'Compute begin milesian date
