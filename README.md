@@ -5,7 +5,10 @@ Copyright (c) Miletus, Louis-Aimé de Fouquières, 2017
 
 MIT licence applies
 
-MAC OS users: check date conversion starting from 1904.
+MAC OS users: 
+1. You will have to insert manually (not with "import") the modules.
+1. Works possibly only on the latest versions of Excel (those which handle VBA).
+1. Check date conversion starting from 1904. It might work from 2 January 1904 only.
 
 ## Installation
 1. Create a new Excel file, save as "Excel file with macros".
