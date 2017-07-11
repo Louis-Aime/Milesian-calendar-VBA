@@ -24,7 +24,8 @@ Dim Phase As Double
 If IsMissing(MoonPhase) Then MoonPhase = 0
 If ActiveWorkbook.Date1904 And FromDate >= 1 Then FromDate = FromDate - DayOffsetMacOS
 If MoonPhase < 0 Or MoonPhase > 3 Then Error 1
-Phase = FromDate - MeanNewMoon2000 - (MoonPhase / 4) * MeanSynodicMoon
+Phase = FromDate	'Force conversion to Double
+Phase = Phase - MeanNewMoon2000 - (MoonPhase / 4) * MeanSynodicMoon
 If ActiveWorkbook.Date1904 Then Phase = Phase + DayOffsetMacOS
  While Phase < 0
     Phase = Phase + MeanSynodicMoon
