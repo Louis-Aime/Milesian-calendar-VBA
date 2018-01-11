@@ -47,6 +47,11 @@ A part ces cas, ce sont les règles grégoriennes qui s'appliquent.
 Paramètre: 
 	Year, année dont on cherche à déterminer le type
 
+MILESIAN_YEAR_BASE: Date Excel correspondant à la base d'une année c'est à dire le jour précédent le 1 1m de l'année. 
+Résultat entre 20/1/1900 et une date en 9999.
+Paramètre:
+	Year : Année milésienne dont la base est recherchée.
+	
 Les autres fonctions sont analogues à des fonctions de la catégorie "Date et heure" d'Excel.
 Les dates calculées en option ordinaires peuvent être des nombres négatifs, le minimum correspondant au 1/1/100 grégorien. 
 Ces dates antérieures à 1900 ne sont pas affichées par Excel, mais on peut les gérer et notamment les afficher en milésien.
@@ -63,11 +68,6 @@ Paramètres:
 	DayInMonth: Quantième dans le mois (1 à 31)
 Si le triplet ne correspond pas à une date valide, la fonction retourne une erreur.
 
-MILESIAN_YEAR_BASE: Date Excel correspondant à la base d'une année c'est à dire le jour précédent le 1 1m de l'année. 
-Résultat entre 20/1/1900 et une date en 9999.
-Paramètre:
-	Year : Année milésienne dont la base est recherchée.
-	
 MILESIAN_YEAR: Année milésienne d'une date Excel (Minimum 100 en version non Date1904, minimum 1904 en version Date1904)
 Paramètre: 
 	ExcelDate: date Excel, qui peut être une date et heure, seule la date (partie entière) est considérée.
