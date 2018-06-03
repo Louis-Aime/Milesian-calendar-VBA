@@ -52,9 +52,11 @@ The minimum negative value is Gregorian 1 January of year 100.
 For old MacOS sheets, no date before 1 Jan 1904 can be handled.
 
 * MILESIAN_YEAR, MILESIAN_MONTH, MILESIAN_DAY: the Milesian date elements of an Excel date-time stamp.
+* MILESIAN_DATE (Year, Month, Day_in_month): the time stamp (at 00:00) of a Milesian date given by its elements.
 * MILESIAN_TIME: the time part of a time stamp; works with dates prior to 30/12/1899. 
 The time is always the positive fractional part of the time stamp, even if the stamp is negative.
-* MILESIAN_DISPLAY (D) : a string that expresses a date in Milesian.
+* MILESIAN_DISPLAY (Date, Wtime) : a string that expresses a date in Milesian.
+If optional Wtime is *true* or missing, time part is added to string.
 * MILESIAN_MONTH_END : works like MONTH.END.
 * MILESIAN_MONTH_SHIFT : works like MONTH.SHIFT.
 
@@ -80,10 +82,6 @@ Decimal Julian Day from Excel time stamp, deemed UTC date.
 Excel time stamp (Date type) representing the UTC Date from a fractional Julian Day.
 * Count: fractional Julian Day to convert.
 
-### DATE_Exceltype (Cell_Date)
-Convert any cell with a date item, including from a Date1904 sheet, into a proper Excel timestamp. 
-* Cell_Date: date argument, most often a date cell
-
 ### DAYOFWEEK_Ext (Date, Option)
 The day of the week for the Date, with another default option.
 * Date: the date whose day of week is computed
@@ -94,6 +92,10 @@ The day of the week for the Date, with another default option.
 ### EASTER_SUNDAY (Year)
 The day of Easter under Gregorian computus.
 * Year: the year for which Easter Sunday is computed. An integer number, greater than 1582.
+
+### DATE_Exceltype (Cell_Date)
+Convert any cell with a date item, including from a Date1904 sheet, into a proper Excel timestamp. 
+* Cell_Date: date argument, most often a date cell
 
 ## MilesianMoonPhase
 Next or last mean moon. Error is +/- 6 hours for +/- 3000 years from year 2000.
