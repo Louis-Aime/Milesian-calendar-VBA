@@ -65,9 +65,9 @@ Boolean, whether the year is long (366 days) or not.
 * Year, the year in question.
 
 A long Milesian year is just before a leap year, e.g. 2015 is a long year because 2016 is a leap year. 
-With the Milesian calendar, a proposed rule is this:
-years -4001, -801, 2399, 5599 etc. (every 3200 years) are *not* long. 
-Elsewise the Gregorian rules are applied, e.g. 1899 is *not* long whereas 1999 is.
+The Milesian calendar use the Gergorian rules for leap years, with one additional rule: 
+years -4000, -800, 2400, 5600 etc. (every 3200 years) are *not* leap years, 
+hence -4001, -801, 2399, 5599 are *not* long Milesian years. 
 Remember that by mistake, dates 1/1/1900 to 29/2/1900 are wrong under Microsoft Windows.
 
 ### MILESIAN_YEAR_BASE (Year) 
