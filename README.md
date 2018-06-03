@@ -17,7 +17,7 @@ MAC OS users:
 1. Import the suitable .bas files of the release. You may import one or several.
 1. After importing, you see new "modules", one for each .bas file. You can see the source code and comments.
 1. In "File" menu, hit "Close and back to Excel".
-1. In Excel file, you can call the fucntions of the modules you selected.
+1. In Excel file, you can call the functions of the modules you selected.
 
 ## Using the functions
 * Hit "insert function" near the input bar.
@@ -118,6 +118,6 @@ or if the complete string begins with "M", in which case elements must be in the
 Due to Excel, no date before year 100 can be handled. 
 Separators between date elements must be the same (except comma with spaces). 
 It is possible to specify only 2 date elements, including the month. 
-If specified, the year is 3-digits. Elsewhise, it is considered "current year".
+If specified, the year is 3-digits. If missing, it is considered "current year".
 If day of month is not specified, it is set to 1.
 This function applied to *string* date expressions from 1/1/1900 to 28/02/1900 yields correct dates.
