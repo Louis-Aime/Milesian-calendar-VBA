@@ -1,121 +1,193 @@
 Package MilesianCalendar for Excel - M2017-06-15
-Dernière mise à jour M2018-01-21
+DerniÃ¨re mise Ã  jour M2018-06-13
 
 Modules permettant des actions en langage VBA pour Excel. 
 
-Source rédigé en anglais.
+Source rÃ©digÃ© en anglais.
 Auteur: Miletus SARL 2017-2018 (www.calendriermilesien.org).
-Transformation et adaptation sous réserve de citation de l'auteur.
-Intégration possible dans une offre ou sur un support, sous réserve de citation de l'auteur et du site.
-Testé sur Excel 2016 (Office 365) français, MS Windows et IOS.
-Testé sur  Excel 2007 Windows français.
-Fonctionnement en Date1904 vérifié sur plate-forme Windows.
-Note: Excel 2016 IOS (avec capacité des macros) positionne l'option Date1900 par défaut.
+Transformation et adaptation sous rÃ©serve de citation de l'auteur.
+IntÃ©gration possible dans une offre ou sur un support, sous rÃ©serve de citation de l'auteur et du site.
+TestÃ© sur Excel 2016 (Office 365) franÃ§ais, MS Windows et IOS.
+TestÃ© sur  Excel 2007 Windows franÃ§ais.
+Fonctionnement en Date1904 vÃ©rifiÃ© sur plate-forme Windows.
+Note: Excel 2016 IOS (avec capacitÃ© des macros) positionne l'option Date1900 par dÃ©faut.
 
 Mise en service:
-1. Créez un fichier Excel, sauvegardez-le avec le type "Fichier Excel prenant en charge les macros".
-2. Si vous ne voyez pas le menu "Développeur", validez l'accès à ce menu dans vos options.
-3. Dans le menu "Développeur", choisissez "Visual Basic" à l'extrême gauche.
+1. CrÃ©ez un fichier Excel, sauvegardez-le avec le type "Fichier Excel prenant en charge les macros".
+2. Si vous ne voyez pas le menu "DÃ©veloppeur", validez l'accÃ¨s Ã  ce menu dans vos options.
+3. Dans le menu "DÃ©veloppeur", choisissez "Visual Basic" Ã  l'extrÃªme gauche.
 4. Une feuille Visual Basic s'ouvre. Dans le menu "Fichier" de cette feuille, choisissez "Importer un fichier".
-5. Importez les fichiers nnn.bas que vous souhaitez utilisez. Il n'y a pas d'inconvénients à les importer tous.
-6. Après import, les modules correspondant aux fichiers importés sont visibles. Vous pouvez consulter le code, qui est commenté.
+5. Importez les fichiers nnn.bas que vous souhaitez utilisez. Il n'y a pas d'inconvÃ©nients Ã  les importer tous.
+6. AprÃ¨s import, les modules correspondant aux fichiers importÃ©s sont visibles. Vous pouvez consulter le code, qui est commentÃ©.
 7. Retournez dans votre feuille Excel avec la commande "Fermer et retourner dans Excel" du menu "Fichier" de la feuille Visual Basic.
-8. Dans votre fichier Excel, vous pouvez appeler les fonctions des modules créés.
+8. Dans votre fichier Excel, vous pouvez appeler les fonctions des modules crÃ©Ã©s.
 
 Utilisation des fonctions:
-Vous pouvez retrouver les fonctions importées en cliquant le bouton "Insérer une fonction" de la barre de saisie.
-- Sélectionnez la catégorie "Personnalisées".
+Vous pouvez retrouver les fonctions importÃ©es en cliquant le bouton "InsÃ©rer une fonction" de la barre de saisie.
+- SÃ©lectionnez la catÃ©gorie "PersonnalisÃ©es".
 - Les fonctions apparaissent.
-- Si vous choisissez une fonction, la liste des variables apparaît (sans aide dans la version actuelle).
-Les fonctions sont sensibles à l'option avancée "Calendrier depuis 1904" positionnée par défaut dans la version MacOS de MS Excel et modifiable.
+- Si vous choisissez une fonction, la liste des variables apparaÃ®t (sans aide dans la version actuelle).
+Les fonctions sont sensibles Ã  l'option avancÃ©e "Calendrier depuis 1904" positionnÃ©e par dÃ©faut dans la version MacOS de MS Excel et modifiable.
+
+ConsidÃ©rations sur les expressions de date en Microsoft Excel
+- Excel pour MacOS ne gÃ¨re pas VBA jusqu'Ã  la version 2013.
+- Le timbre Ã  date Excel est un nombre dÃ©cimal de jours, comptÃ©s Ã  partir du 30/12/1899 Ã  00:00, 
+en calendrier grÃ©gorien et sans gestion d'heure locale, y compris pour Excel sous MacOS depuis 2013.
+- Expressions de dates du 1/1/1900 au 29/2/1900: MS Excel les convertit Ã  tort 
+en un numÃ©ro reprÃ©sentant le jour prÃ©cÃ©dent, et affiche ces numÃ©ros de sÃ©rie en dates dÃ©calÃ©es d'un jour.
+Toutefois, ces expressions de dates maintenues en tant que texte (avec une quote) et passÃ©es Ã  VBA 
+sont correctement converties.
+- Expressions de date du 1/1/100 (grÃ©gorien) au 31/12/1899: Excel le ne convertit pas, 
+mais VBA les convertit en un nombre nÃ©gatif de type Date. Excel les affiche en ############.
+- Expressions de dates antÃ©rieures au 31/12/1899 et comportant une composante horaire: 
+Excel retire au timbre Ã  date la partie dÃ©cimale reprÃ©sentant l'heure, au lieu de l'ajouter.
+- Date la plus ancienne: 1/1/100 (grÃ©gorien), date la plus Ã©loignÃ©e: 31/12/9999 Ã  23:59:59.
+- Avec l'option Date1904 sur d'anciennes feuilles MacOS: Les dates antÃ©rieurs Ã  1/1/1904 provoquent une erreur
+
+Certaines fonctions permettent de pallier certains de ces problÃ¨mes.
+
 
 Architecture des modules:
-	MilesianCalendar: Lire et décomposer une date en milésien, et créer une date à partir des coordonnées jour, mois, année en milésien.
-	MilesianMoon: Calculs de phases de lune à partir d'une date.
+	MilesianCalendar: Lire et dÃ©composer une date en milÃ©sien, et crÃ©er une date Ã  partir des coordonnÃ©es jour, mois, annÃ©e en milÃ©sien.
+	MilesianMoonPhase: Calculs de phases de lune Ã  partir d'une date.
 
-Les modules sont indépendants l'un de l'autre
+Les modules sont indÃ©pendants l'un de l'autre
 
-Les fonctions utilisables et leurs paramètres, par module:
+Les fonctions utilisables et leurs paramÃ¨tres, par module:
 
 
 #MilesianCalendar
 
-MILESIAN_IS_LONG_YEAR: Booléeen, indique si l'année milésienne est abondante. 
-Une année milésienne abondante est une année qui précède une année bissextile. 
-La règle d'intercalation milésienne est appliquée, donc les années: -4001, -801, 2399, 5599 etc. sont non abondantes. 
-A part ces cas, ce sont les règles grégoriennes qui s'appliquent.
-Paramètre: 
-	Year, année dont on cherche à déterminer le type
+Fonctions semblables aux fonctions standard d'Excel:
+- Elles sont calquÃ©es sur des fonctions de la catÃ©gorie Date et Heure
+Les dates calculÃ©es en option ordinaires peuvent Ãªtre des nombres nÃ©gatifs, le minimum correspondant au 1/1/100 grÃ©gorien. 
+Ces dates antÃ©rieures Ã  1900 ne sont pas affichÃ©es par Excel, mais on peut les gÃ©rer et notamment les afficher en milÃ©sien.
+Ceci n'est toutefois possible, sous Excel Windows, que si l'option Date1904 est dÃ©cochÃ©e. 
+Avec l'option Date1904 cochÃ©e, les dates antÃ©rieurs Ã  1/1/1904 provoquent une erreur.
+Ces fonctions sont les suivantes (voir aussi infra)
+* MILESIAN_YEAR, MILESIAN_MONTH, MILESIAN_DAY: ElÃ©ments de date milÃ©sienne d'un timbre Ã  date.
+* MILESIAN_DATE (Year, Month, Day_in_month): le timbre Ã  date (Ã  00:00) Ã  partir des Ã©lÃ©ments d'une date milÃ©sienne.
+* MILESIAN_TIME: la composante horaire d'un timbre Ã  date; fonctionne aussi pour des dates antÃ©rieures au 30/12/1899. 
+La composante horaire est toujours la partie fractionnaire positive, mÃªme si le timbre Ã  date est nÃ©gatif.
+* MILESIAN_DISPLAY (Date, Wtime) : une chaÃ®ne de caractÃ¨res exprimant la date en milÃ©sien.
+Si le paramÃ¨tre optionel Wtime is vrai ou absent, la composante horaire est affichÃ©e.
+* MILESIAN_MONTH_END : comme MONTH.END (MOIS.FIN).
+* MILESIAN_MONTH_SHIFT : comme MONTH.SHIFT (MOIS.DECALER).
 
-MILESIAN_YEAR_BASE: Date Excel correspondant à la base d'une année c'est à dire le jour précédent le 1 1m de l'année. 
-Résultat entre 20/1/1900 et une date en 9999.
-Paramètre:
-	Year : Année milésienne dont la base est recherchée.
+MILESIAN_IS_LONG_YEAR: BoolÃ©een, indique si l'annÃ©e milÃ©sienne est abondante. 
+Une annÃ©e milÃ©sienne abondante est une annÃ©e qui prÃ©cÃ¨de une annÃ©e bissextile. 
+La rÃ¨gle d'intercalation milÃ©sienne est appliquÃ©e, donc les annÃ©es: -4001, -801, 2399, 5599 etc. sont non abondantes. 
+A part ces cas, ce sont les rÃ¨gles grÃ©goriennes qui s'appliquent.
+ParamÃ¨tre: 
+	Year : annÃ©e dont on cherche Ã  dÃ©terminer le type
+
+MILESIAN_YEAR_BASE: Date Excel correspondant Ã  la base d'une annÃ©e c'est Ã  dire le jour prÃ©cÃ©dent le 1 1m de l'annÃ©e. 
+RÃ©sultat entre 20/1/1900 et une date en 9999.
+ParamÃ¨tre:
+	Year : AnnÃ©e milÃ©sienne dont la base est recherchÃ©e.
+
+JULIAN_EPOCH_COUNT (Date) : jour julien (dÃ©cimal) correspondant Ã  une date
+ParamÃ¨tre:
+	Date: la date Ã  convertir
+
+JULIAN_EPOCH_DATE (Count) : date (et heure) correpondant au jour julien dÃ©cimal
+ParamÃ¨tre: 
+	Count: jour julien, nombre dÃ©cimal
+
+DAYOFWEEK_Ext (Date, Option): nÂ° de jour de semaine, selon une option Ã©tendue.
+ParamÃ¨tres:
+	Date: la date dont on cherche le jour de semaine
+	Option (optionnel) : un nombre, 0 par dÃ©faut.
+		0 (dÃ©faut): 0 = dimanche, 1 = lundi, etc., 6 = samedi.
+		1 (dÃ©faut avec JOURDESEMAINE pour Excel) : 1 = dimanche, 7 = samedi.
+		2, 3, 11 Ã  17: mÃªmes effets qu'avec JOURDESEMAINE.
+
+EASTER_SUNDAY (Year)
+Date du dimanche de PÃ¢ques selon le comput grÃ©gorien.
+ParamÃ¨tres: 
+	Year: annÃ©e pour laquelle on fait le calcul. Un nombre entier, plus grand que 1582.
+
+DATE_Exceltype (Cell_Date)
+Convertit toute cellule contenant un Ã©lÃ©ment de date, y compris d'une ancienne feuille en mode Date1904,
+en un timbre Ã  date exact. 
+ParamÃ¨tre:
+	Cell_Date: la date Ã  convertir, le plus souvent une cellule.
+
+MILESIAN_DATE: Date Excel correspondant Ã  une date milÃ©sienne dont les Ã©lÃ©ments sont donnÃ©s en paramÃ¨tres. 
+RÃ©sultat (affichÃ©) entre 1/1/1900 et 31/12/9999, et correctement calculÃ© Ã  partir du 1/1/100 en grÃ©gorien proleptique.
+Les deux premiers mois de 1900 affichÃ©s en grÃ©gorien par Excel sont faux (erreur Microsoft connue).
+La date est entiÃ¨re, l'heure est 00h.
+ParamÃ¨tres: 
+	Year: AnnÃ©e milÃ©sienne (>=100, comptÃ©e dans l'Ã¨re commune) 
+	Month: numÃ©ro du mois (1 Ã  12) 
+	DayInMonth: QuantiÃ¨me dans le mois (1 Ã  31)
+Si le triplet ne correspond pas Ã  une date valide, la fonction retourne une erreur.
+
+MILESIAN_YEAR: AnnÃ©e milÃ©sienne d'une date Excel (Minimum 100 en version non Date1904, minimum 1904 en version Date1904)
+ParamÃ¨tre: 
+	ExcelDate: date Excel, qui peut Ãªtre une date et heure, seule la date (partie entiÃ¨re) est considÃ©rÃ©e.
+
+MILESIAN_MONTH: NumÃ©ro de mois milÃ©sien d'une date Excel (1 Ã  12)
+ParamÃ¨tre: 
+	ExcelDate: date Excel, qui peut Ãªtre une date et heure: seule la date est considÃ©rÃ©e
+
+MILESIAN_DAY: QuantiÃ¨me dans le mois milÃ©sien d'une date Excel (1 Ã  31)
+ParamÃ¨tre: 
+	ExcelDate: date Excel, qui peut Ãªtre une date et heure: seule la date est considÃ©rÃ©e
+
+MILESIAN_DISPLAY: Une chaÃ®ne de caractÃ¨res exprimant la date milÃ©sienne d'une date Excel
+ParamÃ¨tre: 
+	ExcelDate: date Excel, qui peut Ãªtre une date et heure: seule la date est considÃ©rÃ©e
+
+MILESIAN_MONTH_SHIFT: Date de mÃªme quantiÃ¨me, n mois avant ou aprÃ¨s une date donnÃ©e. 
+MÃªme fonctionnement que la fonction standard MOIS.DECALER.
+Si le quantiÃ¨me de la date de dÃ©part est le 31, le quantiÃ¨me d'arrivÃ©e est celui du dernier jour du mois.
+ParamÃ¨tres:
+	ExcelDate: date Excel de dÃ©part; 
+	MonthShift: nombre de mois de dÃ©calage, positif (futur) ou nÃ©gatif (passÃ©).
+
+MILESIAN_MONTH_END: Date de fin de mois milÃ©sien, n mois avant ou aprÃ¨s une date donnÃ©e. 
+MÃªme fonctionnement que la fonction standard FIN.MOIS (qui cherche une fin de mois grÃ©gorien).
+ParamÃ¨tres:
+	ExcelDate: date Excel de dÃ©part; 
+	MonthShift: nombre de mois de dÃ©calage, positif (futur) ou nÃ©gatif (passÃ©).
 	
-Les autres fonctions sont analogues à des fonctions de la catégorie "Date et heure" d'Excel.
-Les dates calculées en option ordinaires peuvent être des nombres négatifs, le minimum correspondant au 1/1/100 grégorien. 
-Ces dates antérieures à 1900 ne sont pas affichées par Excel, mais on peut les gérer et notamment les afficher en milésien.
-Ceci n'est toutefois possible, sous Excel Windows, que si l'option Date1904 est décochée. 
-Avec l'option Date1904 cochée, les dates antérieurs à 1/1/1904 provoquent une erreur.
 
-MILESIAN_DATE: Date Excel correspondant à une date milésienne dont les éléments sont donnés en paramètres. 
-Résultat (affiché) entre 1/1/1900 et 31/12/9999, et correctement calculé à partir du 1/1/100 en grégorien proleptique.
-Les deux premiers mois de 1900 affichés en grégorien par Excel sont faux (erreur Microsoft connue).
-La date est entière, l'heure est 00h.
-Paramètres: 
-	Year: Année milésienne (>=100, comptée dans l'ère commune) 
-	Month: numéro du mois (1 à 12) 
-	DayInMonth: Quantième dans le mois (1 à 31)
-Si le triplet ne correspond pas à une date valide, la fonction retourne une erreur.
+#MilesianMoonPhase
 
-MILESIAN_YEAR: Année milésienne d'une date Excel (Minimum 100 en version non Date1904, minimum 1904 en version Date1904)
-Paramètre: 
-	ExcelDate: date Excel, qui peut être une date et heure, seule la date (partie entière) est considérée.
+Calcul de derniÃ¨re ou de prochaine lune. Marge d'erreur de 6 heures pour +/- 3000 ans Ã  partir de l'an 2000 
+(en rÃ©alitÃ© on ne peut calculer avant l'an 100 avec Excel).
 
-MILESIAN_MONTH: Numéro de mois milésien d'une date Excel (1 à 12)
-Paramètre: 
-	ExcelDate: date Excel, qui peut être une date et heure: seule la date est considérée
-
-MILESIAN_DAY: Quantième dans le mois milésien d'une date Excel (1 à 31)
-Paramètre: 
-	ExcelDate: date Excel, qui peut être une date et heure: seule la date est considérée
-
-MILESIAN_DISPLAY: Une chaîne de caractères exprimant la date milésienne d'une date Excel
-Paramètre: 
-	ExcelDate: date Excel, qui peut être une date et heure: seule la date est considérée
-
-MILESIAN_MONTH_SHIFT: Date de même quantième, n mois avant ou après une date donnée. 
-Même fonctionnement que la fonction standard MOIS.DECALER.
-Si le quantième de la date de départ est le 31, le quantième d'arrivée est celui du dernier jour du mois.
-Paramètres:
-	ExcelDate: date Excel de départ; 
-	MonthShift: nombre de mois de décalage, positif (futur) ou négatif (passé).
-
-MILESIAN_MONTH_END: Date de fin de mois milésien, n mois avant ou après une date donnée. 
-Même fonctionnement que la fonction standard FIN.MOIS (qui cherche une fin de mois grégorien).
-Paramètres:
-	ExcelDate: date Excel de départ; 
-	MonthShift: nombre de mois de décalage, positif (futur) ou négatif (passé).
-	
-
-#MilesianMoon
-
-Calcul de dernière ou de prochaine lune. Marge d'erreur de 6 heures pour +/- 3000 ans à partir de l'an 2000 
-(en réalité on ne peut calculer avant l'an 100 avec Excel).
-
-LastMoonPhase: La date de la dernière nouvelle lune, ou de la dernière phase lunaire spécifiée.
-L'horodatage est en heure TT, très proche de l'heure UTC à nos époques.
-Le calcul est fondée sur une lune moyenne linéaire (non corrigée). La nouvelle lune moyenne de référence est la première de l'an 2000.
-Paramètres: 
-	FromDate: jour auquel on se réfère ; 
-	MoonPhase (=0 si non présent): 0=nouvelle lune, 1=premier quartier, 2=pleine lune, 3=dernier quartier, 
+LastMoonPhase: La date de la derniÃ¨re nouvelle lune, ou de la derniÃ¨re phase lunaire spÃ©cifiÃ©e.
+L'horodatage est en heure TT, trÃ¨s proche de l'heure UTC Ã  nos Ã©poques.
+Le calcul est fondÃ©e sur une lune moyenne linÃ©aire (non corrigÃ©e). La nouvelle lune moyenne de rÃ©fÃ©rence est la premiÃ¨re de l'an 2000.
+ParamÃ¨tres: 
+	FromDate: jour auquel on se rÃ©fÃ¨re ; 
+	MoonPhase (=0 si non prÃ©sent): 0=nouvelle lune, 1=premier quartier, 2=pleine lune, 3=dernier quartier, 
 		erreur pour toute autre valeur de MoonPhase.
 
-NextMoonPhase: Le date de la prochaine nouvelle lune, ou de la prochaine phase lunaire spécifiée.
-L'horodatage est en heure TT, très proche de l'heure UTC à nos époques.
-Le calcul est fondée sur une lune moyenne linéaire (non corrigée). 
-La nouvelle lune moyenne de référence est la première de l'an 2000.
-Paramètres: 
-	FromDate: jour auquel on se réfère ; 
-	MoonPhase (=0 si non présent): 0=nouvelle lune, 1=premier quartier, 2=pleine lune, 3=dernier quartier, 
+NextMoonPhase: Le date de la prochaine nouvelle lune, ou de la prochaine phase lunaire spÃ©cifiÃ©e.
+L'horodatage est en heure TT, trÃ¨s proche de l'heure UTC Ã  nos Ã©poques.
+Le calcul est fondÃ©e sur une lune moyenne linÃ©aire (non corrigÃ©e). 
+La nouvelle lune moyenne de rÃ©fÃ©rence est la premiÃ¨re de l'an 2000.
+ParamÃ¨tres: 
+	FromDate: jour auquel on se rÃ©fÃ¨re ; 
+	MoonPhase (=0 si non prÃ©sent): 0=nouvelle lune, 1=premier quartier, 2=pleine lune, 3=dernier quartier, 
 		erreur pour toute autre valeur de MoonPhase.
+
+#DateParse
+Ce module ne contient qu'une fonction, un parseur de chaÃ®ne de caractÃ¨res, capable d'interprÃ©ter 
+une chaÃ®ne (avec une date sous forme numÃ©rique) en tant que date grÃ©gorienne ou milÃ©sienne.
+
+DateParse (ChaÃ®ne): Date (timbre Ã  date) correspondant Ã  une expression de date.
+ParamÃ¨tre: 
+	ChaÃ®ne: l'expression Ã  interprÃ©ter comme date.
+L'expression de date est milÃ©sienne soit si le chiffre de mois finit par "m" (sans zÃ©ro initial au nom de mois), 
+soit si la chaÃ®ne complÃ¨te commence par "M", auquel cas les Ã©lÃ©ments de dates sont dans l'ordre annÃ©e, mois, quantiÃ¨me.
+Avec Excel, aucune date antÃ©rieure Ã  l'annÃ©e 100 n'est traitÃ©e.
+Le sÃ©parateur entre Ã©lÃ©ments de dates est le mÃªme, sauf Ã©ventuellement une virgule ajoutÃ©e Ã  un blanc.
+On peut ne spÃ©cifier que deux Ã©lÃ©ments de date, mais il faut inclure le mois.
+Si spÃ©cifiÃ©e, la date comprend au moins 3 chiffres, c'est ainsi qu'on la reconnaÃ®t. 
+Si elle est absente, l'annÃ©e est "l'annÃ©e courante".
+Si le quantiÃ¨me est absent, la fonction le fixe Ã  1.
+Les expressions de date entre 1/1/1900 et 28/2/1900 sont analysÃ©s correctement.
