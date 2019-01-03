@@ -135,7 +135,7 @@ End If
 '7. Find whether there is a Day indication, make last computations and return
 Select Case K
     Case "D"
-        'Here a piece of code to placed when Date objects hold next year 0 date, and if MS does not compute them well.
+        'Here a piece of code to be placed when Date objects hold near year 0 date, and if MS does not compute them well.
         DATE_PARSE = DateValue(TheCell) + T    'Standard procedure for non-specified calendar
      Case "M"    'At this level, Mindex is known  (>-1). Find and check other elements.
         If Mindex > 1 Then Err.Raise 1  'Month may never be indicated as 3rd element
