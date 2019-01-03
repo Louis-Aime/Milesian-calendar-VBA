@@ -1,6 +1,6 @@
 Attribute VB_Name = "MilesianCalendar"
 'MilesianCalendar: Enter and display dates in Microsoft Excel following Milesian calendar conventions
-'Copyright Miletus SARL 2016-2018. www.calendriermilesien.org
+'Copyright Miletus SARL 2016-2019. www.calendriermilesien.org
 'For use as an MS Excel VBA module.
 'Developped under Excel 2016
 'Tested under MS Excel 2007 (Windows) and 2016 (Windows and MacOS)
@@ -12,9 +12,9 @@ Attribute VB_Name = "MilesianCalendar"
 ' Since MS Engineer only make garbage when using dates,
 ' the maximum is done here to avoid letting Excel impose his silly "Date" type.
 ' A special function, MICROSOFT_DATE_TIME_FIX is used for text used for entering date and time before 1 March 1900.
-'Version V2 M2018-02-10
+'Version V3 M2019-01-14
 
-Const MStoPresentEra As Long = 986163 'Offset between 1/1m/-800 epoch and Microsoft origin (1899-12-30T00:00 is 0)
+Const MStoPresentEra As Long = 693969 'Offset between 1/1m/000 epoch and Microsoft origin (1899-12-30T00:00 is 0)
 Const MStoJulianMinus05 As Long = 2415018 'Offset between julian day epoch and Microsoft origin, minus 0.5
 Const HighYear = 9999   'Higher year that is handles (Excel goes up to 31/12/9999 Gregorian)
 Const LowYear = 100     'As long as MS does not handle date before Gregorian 1/1/100. Else we'd take -9999
@@ -93,7 +93,7 @@ Attribute MILESIAN_IS_LONG_YEAR.VB_Description = "Return whether year is 366 day
 'Is year Year a 366 days year, i.e. a year just before a bissextile year following the Milesian rule.
 If Year <> Int(Year) Or Year < LowYear Or Year > HighYear Then Err.Raise 1
 Year = Year + 1
-MILESIAN_IS_LONG_YEAR = PosMod(Year, 4) = 0 And (PosMod(Year, 100) <> 0 Or (PosMod(Year, 400) = 0 And PosMod(Year + 800, 3200) <> 0))
+MILESIAN_IS_LONG_YEAR = PosMod(Year, 4) = 0 And (PosMod(Year, 100) <> 0 Or PosMod(Year, 400) = 0)
 End Function
 
 '#Part 3: Compute date from milesian parameters
@@ -113,9 +113,9 @@ If Year >= LowYear And Year <= HighYear And Month > 0 And Month < 13 And DayInMo
   M1 = Month - 1 'Count month rank, i.e. 0..11
   Milesian_IntegDiv M1, 2, B, M1 'B = full bimesters, M1 = 1 if a full month added, else 0
   If DayInMonth < 31 Or (M1 = 1 And (B < 5 Or MILESIAN_IS_LONG_YEAR(Year))) Then
-    Y = Year + 800    'Set Epoch to the year -800
-    A = PosDiv(Y, 4) - PosDiv(Y, 100) + PosDiv(Y, 400) - PosDiv(Y, 3200) 'Sum non-long terms: leap days
-    D = Y         'Force long-interger conversion
+'    Y = Year    'Set Epoch to the year 0
+    A = PosDiv(Year, 4) - PosDiv(Year, 100) + PosDiv(Year, 400) 'Sum non-long terms: leap days
+    D = Year         'Force long-integer conversion
     D = D * 365      'Begin computation of days in long-integer;
     D = D - MStoPresentEra - 1 + B * 61 + M1 * 30 + A + DayInMonth 'Computations in long-integer first
     MILESIAN_DATE = D
@@ -131,10 +131,10 @@ Function MILESIAN_YEAR_BASE(ByVal Year) As Date 'The Year base or Doomsday of a 
 Attribute MILESIAN_YEAR_BASE.VB_Description = "Date of last day before milesian year (at 00:00), for doomsday and epact."
 Dim A As Integer, D As Long   'Force long integer
 If Year <> Int(Year) Or Year < LowYear Or Year > HighYear Then Err.Raise 1
-Year = Year + 800    'Set Epoch to the year -800
+'Year = Year + 800    'Set Epoch to the year -800
 D = Year        'Force long-integer conversion
 D = D * 365     'Begin computation of days in long-integer;
-A = PosDiv(Year, 4) - PosDiv(Year, 100) + PosDiv(Year, 400) - PosDiv(Year, 3200)
+A = PosDiv(Year, 4) - PosDiv(Year, 100) + PosDiv(Year, 400)
 D = D - MStoPresentEra + A - 1           'Computations in long-integer first
 MILESIAN_YEAR_BASE = D
 End Function
@@ -156,10 +156,8 @@ Dim Cycle As Long, Day As Long      'Cycle is used serveral times with a differe
 Day = Int(DNum)  'Initiate Day as highest integer lower or equal to DNum, and avoid control on Date type
 T = DNum - Day   'Extract time part of the Date element. ALWAYS POSITIVE, DUMB MICROSOFT ENGINEERS.
 Day = Day + MStoPresentEra
-Milesian_IntegDiv Day, 1168775, Cycle, Day   'Day is day rank in Milesian era (starting from 1/1m/-800), Cycle is era (0 begins 1/1/-800)
-Y = -800 + Cycle * 3200
 Milesian_IntegDiv Day, 146097, Cycle, Day    'Day is day rank in 400 years period, Cycle is quadrisaeculum
-Y = Y + Cycle * 400
+Y = Cycle * 400
 Milesian_IntegDivCeiling Day, 36524, 4, Cycle, Day   'Day is day rank in century, Cycle is rank of century
 Y = Y + Cycle * 100
 Milesian_IntegDiv Day, 1461, Cycle, Day              'Day rank in quadriannum
