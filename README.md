@@ -22,18 +22,18 @@ MAC OS users:
 ## Using the functions
 * Hit "insert function" near the input bar.
 * Choose "custom" - you can see the functions.
-* If you choose one function, the parameter list appear (sorry, no help in this version).
+* If you choose one function, the parameter list appears (sorry, no help in this version).
 * Functions are sensitive to "1904 Calendar" (by default on MacOS in old versions of Excel)
 
 ## Considerations on date expressions (strings representing a date) in Excel
-* These functions might not work with Excel version prior to 2013.
+* These functions might not work with Excel versions prior to 2013.
 * Excel Timestamp is a fractional number of days counted from 30 Dec 1899 00:00 Gregorian, 
 with no local time consideration, even with new MacOS sheets. 
 * Date expression from 1/1/1900 to 29/2/1900: by default, Excel wrongly converts these expressions 
 into a time stamp representing the day before, 
 and conversely displays the corresponding time stamp into wrong date expression. 
 However, if specified as strings (starting with a quote) and passed to VBA,
-those date expression are converted without error.
+those date expressions are converted without error.
 * Excel does not convert a date expression (without time) from 1/1/100 to 31/12/1899
 but VBA converts it into a negative integer time stamp.
 * VBA wrongly converts any date-time expression prior to 31/12/1899 00:00:00, 
@@ -65,9 +65,7 @@ Boolean, whether the year is long (366 days) or not.
 * Year, the year in question.
 
 A long Milesian year is just before a leap year, e.g. 2015 is a long year because 2016 is a leap year. 
-The Milesian calendar use the Gergorian rules for leap years, with one additional rule: 
-years -4000, -800, 2400, 5600 etc. (every 3200 years) are *not* leap years, 
-hence -4001, -801, 2399, 5599 are *not* long Milesian years. 
+The Milesian calendar use the Gregorian rules for leap years.
 Remember that by mistake, dates 1/1/1900 to 29/2/1900 are wrong under Microsoft Windows.
 
 ### MILESIAN_YEAR_BASE (Year) 
@@ -104,7 +102,7 @@ Date of last new moon, or of other specified moon phase. Result is in Terrestria
 * FromDate: Base Excel date (deemed UTC);
 * MoonPhase (0 by default): 0 for new moon, 1 for 1st quarter, 2 for full moon, 3 for last quarter.
 ### NextMoonPhase (FromDate, Moonphase)
-Similar, but computes next moon phase.
+Similar, but computes date of next moon phase.
 
 ## DateParse
 This module has only a string parser, that converts a (numeric) Gregorian or Milesian date or date-time expression 
