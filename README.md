@@ -63,6 +63,16 @@ If optional Wtime is *true* or missing, time part is added to string.
 * MILESIAN_MONTH_END : works like MONTH.END.
 * MILESIAN_MONTH_SHIFT : works like MONTH.SHIFT.
 
+### DATE_SHIFT
+Date, the date after a duration
+* StartDate, start date...
+* Shift: a duration in decimal days to add to the date. Target date will be before start date if Shift is negative.
+
+### DURATION
+A number of decimal days between two dates. Negative if begin date is after end date.
+* Begin date
+* End date
+
 ### MILESIAN_IS_LONG_YEAR (Year)
 Boolean, whether the year is long (366 days) or not. 
 * Year, the year in question.
@@ -74,6 +84,11 @@ Remember that by mistake, dates 1/1/1900 to 29/2/1900 are wrong under Microsoft 
 ### MILESIAN_YEAR_BASE (Year) 
 Date of the day before the 1 1m of year Y, i.e. the "doomsday", at 7:30 (a.m.) for moon computations.
 * Year: the year whose base is to be computed.
+
+### MILESIAN_DOOMSDAY (Year, Option)
+The day of the week that is common to all "key-day" of the Milesian or Gregorian year.
+* Year: the year for which the doomsday is computed
+* Option: a number (default 0), used as DAYOFWEEK_Ext
 
 ### JULIAN_EPOCH_COUNT (Date)
 Decimal Julian Day from Excel time stamp, deemed UTC date. 
