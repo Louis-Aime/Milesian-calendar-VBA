@@ -8,14 +8,14 @@ Attribute VB_Name = "DateParse"
 'Neither resale, neither transmission, neither compilation nor integration in other modules
 'are permitted without authorisation
 'DATE_PARSE, applied to any Date-Time expression as a string, returns the corresponding Excel Date series number.
-'EASTER_SUNDAY (Excel only): for a given year > 1582, date of Easter sunday after Gregorian computus.
-'(This function is available on Libre Office Calc).
 'This module uses MilesianCalendar
 'Do not apply to an Excel formatted date between 1 Jan and 29 Feb 1900. Hint: force input to Text format.
-'Version of this module: M2018-02-10
+'Version 2: M2018-02-10
+'Version 3: M2019-06-13: Adapt to MS negative Date object; suppress 3200 cycle for solar intercalation
+'Version 4: M2019-06-27: Constant DayOffsetMacOS taken from module MilesianCalendar
 
 Function DATE_PARSE(TheCell As String) As Date 'A String is converted into a Date
-Attribute DATE_PARSE.VB_Description = "Extract date and time value from string. Standard or Milesian expression. Earliest is Greg. 1/1/100. Fix bug for Date-time expressions before 1900."
+Attribute DATE_PARSE.VB_Description = "Extract date and time value from string TheCell, that holds a standard or Milesian date expression."
 'TheCell holds a valid string for a date, either in milesian, either in a specific calendar,
 'or in the standard calendar (gregorian).
 'TheCell is supposed a numeric date string. It shall not work with months expressed by their names.
@@ -27,13 +27,14 @@ Attribute DATE_PARSE.VB_Description = "Extract date and time value from string. 
 '   5. Find Month element after its pattern ("M" month marker)
 '   6. Find Year element, of provide present year
 '   7. Find Day element of provide "1" by default, return
-'   Note: authorised delimiters are "./-". Comma is dropped. m of Milesian month is recognised. Other lead to error.
+'   Note: authorised delimiters are "./-". Comma is dropped. m of Milesian month is recognised. Other delimiters lead to error.
 '   If as first character: canvas is yyy/mm/dd or similar, even M-yyy-mm-dd is possible.
 '   If not as first, find and extract "m", compute d, m and year elements, call MILESIAN_DATE.
 
 '1. Prepare: Convert string to Uppercase and drop blanks in excess
 Dim Elem, I    'Eleme: the array of elements of TheCell when splitted, I: a standard index
 Dim T As Date, Y, M, D    'The date elements
+Dim IntD As Date 'Integer part of Date, to be checked for negative value in order to yield the proper Excel Date
 Dim Yindex, Mindex, Dindex    'Index of year, month and day in Elem, -1 means "unknown"
 Dim Delimiters      'The list of possible delimiters (outside " ")
 Delimiters = Array("/", ".", "-")
@@ -132,11 +133,13 @@ If Yindex = -1 Then 'Year still not found
   If K = "M" And Yindex = -1 And UBound(Elem) = 2 Then Err.Raise 1 'No 2-char year authorised in Milesian notation
 End If
 
-'7. Find whether there is a Day indication, make last computations and return
+'7. Find whether there is a Day indication, make last computations for the day part
 Select Case K
     Case "D"
-        'Here a piece of code to be placed when Date objects hold near year 0 date, and if MS does not compute them well.
-        DATE_PARSE = DateValue(TheCell) + T    'Standard procedure for non-specified calendar
+        IntD = DateValue(TheCell)   'Integer value obtained when non-specific calendar
+        If ActiveWorkbook.Date1904 Then
+            IntD = IntD - DayOffsetMacOS
+        End If
      Case "M"    'At this level, Mindex is known  (>-1). Find and check other elements.
         If Mindex > 1 Then Err.Raise 1  'Month may never be indicated as 3rd element
         M = Val(Elem(Mindex))
@@ -162,9 +165,18 @@ Select Case K
         Else    'D was not specified
             D = 1
         End If
-        DATE_PARSE = MILESIAN_DATE(Y, M, D) + T
+        IntD = MILESIAN_DATE(Y, M, D)   'Offset Date1904 already here
     Case Else
         Err.Raise 1
     End Select
-
+'8 Check and add time part, negatively only if before 10 1m 1900
+If ActiveWorkbook.Date1904 Then
+    D = -DayOffsetMacOS
+    Else: D = 0
+End If
+If IntD >= D Then
+    DATE_PARSE = IntD + T    'Time is positive decimal
+Else
+    DATE_PARSE = IntD - T    'Time is negative decimal
+End If
 End Function
