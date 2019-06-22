@@ -1,13 +1,14 @@
 # Milesian-calendar-VBA
 Excel VBA functions for Milesian calendar computations
 
-Copyright (c) Miletus, Louis-Aimé de Fouquières, 2017-2018
+Copyright (c) Miletus, Louis-Aimé de Fouquières, 2017-2019
 
 MIT licence applies
 
 MAC OS users: 
-1. This package only works on versions of Excel that handle VBA, i.e. from 2013 on.
-1. Check date conversion starting from 1904 if you use this epoch. Package might work from 2 January 1904 only.
+1. This package only works on versions of Excel that handle VBA, i.e. from 2011 (or 2013 ?) on.
+1. Date conversion starting from 1904 is handled, but calling Milesian functions from VBA packages
+might not work with this option.
 
 ## Installation
 1. Create a new Excel file, save as "Excel file with macros".
@@ -25,25 +26,27 @@ MAC OS users:
 * If you choose one function, the parameter list appears (sorry, no help in this version).
 * Functions are sensitive to "1904 Calendar" (by default on MacOS in old versions of Excel)
 
-## Considerations on date expressions (strings representing a date) in Excel
-* These functions might not work with Excel versions prior to 2013.
-* Excel Timestamp is a fractional number of days counted from 30 Dec 1899 00:00 Gregorian, 
-with no local time consideration, even with new MacOS sheets. 
-* Date expression from 1/1/1900 to 29/2/1900: by default, Excel wrongly converts these expressions 
-into a time stamp representing the day before, 
-and conversely displays the corresponding time stamp into wrong date expression. 
-However, if specified as strings (starting with a quote) and passed to VBA,
-those date expressions are converted without error.
-* Excel does not convert a date expression (without time) from 1/1/100 to 31/12/1899
-but VBA converts it into a negative integer time stamp.
-* VBA wrongly converts any date-time expression prior to 31/12/1899 00:00:00, 
+## Considerations on Date object and date expressions (strings representing a date) in Excel
+* Excel Date object is a fractional number of days counted from 30 Dec 1899 00:00 Gregorian, 
+with no time zone consideration.
+* Dates that Excel displays 1/1/1900 to 29/2/1900 are one day in advance to real date.
+However, Excel converts properly any *string* expressing dates from 1/1/1900 to 28/2/1900
+into the right date object passed to VBA. 
+* Excel does not display any date object from 1/1/100 to 31/12/1899, 
+but VBA converts such date expressions (string values) into a negative Date object.
+* Time part of a VBA Date object for a date prior to 31/12/1899 00:00:00 is a *negative* value.
 the fractional part representing the time in the day is subtracted, instead of added.
 * Lowest date handled is 1 Jan 100 00:00 (Gregorian), highest is 31 Dec 9999 23:59:59 (Gregorian).
 
-Some Excel-specific functions take care of these issues.
+The Milesian functions handle these issues. 
 
 ## MilesianCalendar
 Compute a system date with Milesian date elements, or retrieve Milesian date elements from a system date.
+Display any date in Milesian.
+Retrieve key elements for a Milesian year.
+Compute date shift, duration between dates, Milesian month shift, end of Milesian months.
+Compute Day of week.
+Compute next or last mean moon phase. Error is +/- 6 hours for +/- 3000 years from year 2000.
 
 ### Excel-similar functions of this module 
 They work like the standard date-time functions of Excel. 
@@ -69,7 +72,7 @@ The Milesian calendar use the Gregorian rules for leap years.
 Remember that by mistake, dates 1/1/1900 to 29/2/1900 are wrong under Microsoft Windows.
 
 ### MILESIAN_YEAR_BASE (Year) 
-Date of the day before the 1 1m of year Y, i.e. the "doomsday".
+Date of the day before the 1 1m of year Y, i.e. the "doomsday", at 7:30 (a.m.) for moon computations.
 * Year: the year whose base is to be computed.
 
 ### JULIAN_EPOCH_COUNT (Date)
@@ -91,12 +94,6 @@ The day of the week for the Date, with another default option.
 The day of Easter under Gregorian computus.
 * Year: the year for which Easter Sunday is computed. An integer number, greater than 1582.
 
-### DATE_Exceltype (Cell_Date)
-Convert any cell with a date item, including from a Date1904 sheet, into a proper Excel timestamp. 
-* Cell_Date: date argument, most often a date cell
-
-## MilesianMoonPhase
-Next or last mean moon. Error is +/- 6 hours for +/- 3000 years from year 2000.
 ### LastMoonPhase (FromDate, Moonphase)
 Date of last new moon, or of other specified moon phase. Result is in Terrestrial Time.
 * FromDate: Base Excel date (deemed UTC);
