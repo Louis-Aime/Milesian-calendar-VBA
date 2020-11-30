@@ -47,6 +47,9 @@ Attribute VB_Name = "MilesianCalendar"
     'Add MILESIAN_EPACT and MILESIAN_DOOMSDAY
     'Change YEAR_BASE to the day before 1 1m at 7:30
     'Move moon routines into this module.
+'Version V5 M2020-12-01
+	'Add GREGORIAN_EPACT, the conventional epact computed under Gregorian rules
+	'Change MILESIAN_EPACT: give Gregorian epact shifted to begin of Milesian year
 
 Const MStoPresentEra As Long = 693969 'Offset between 1/1m/0 and Microsoft origin (1899-12-30T00:00:00 is 0)
 Const MStoJulianMinus05 As Long = 2415018 'Offset between julian day epoch and Microsoft origin, minus 0.5
@@ -372,18 +375,6 @@ MILESIAN_YEAR_BASE = DATE_SHIFT(YB, 0.3125) 'This day at 7:30 (for moon computat
 'If ActiveWorkbook.Date1904 Then D = D - DayOffsetMacOS
 End Function
 
-Function MILESIAN_EPACT(ByVal Year) As Double 'The Milesian Epact computed from the mean moon, a duration
-Attribute MILESIAN_EPACT.VB_Description = "The moon age one day before new Milesian year's day"
-    Dim Dnum As Double, B1 As Date, B2 As Date
-    If Year <> Int(Year) Or Year < LowYear Or Year > HighYear Then Err.Raise 1, , "Invalid year"
-    B1 = MILESIAN_YEAR_BASE(Year)
-    If ActiveWorkbook.Date1904 Then B1 = B1 + DayOffsetMacOS 'Cancel artificial final offset for intermediate computation
-    B2 = MOON_PHASE_LAST(B1)
-    If ActiveWorkbook.Date1904 Then B2 = B2 + DayOffsetMacOS 'Cancel artificial final offset for intermediate computation
-    Dnum = DURATION(B2, B1)
-    MILESIAN_EPACT = Int(2 * Dnum + 0.5) / 2
-End Function
-
 Function MILESIAN_DOOMSDAY(ByVal Year, Optional DispType As Integer) As Integer 'The Doomsday for Milesian and also Gregorian year
 Attribute MILESIAN_DOOMSDAY.VB_Description = "Doomsday, or key day of week (clavedi) for this Milesian and Gregorian year, rounded to half-integer"
     Dim YBase As Date
@@ -491,6 +482,19 @@ Attribute DAYOFWEEK_Ext.VB_Description = "Day of week of date expression. Type: 
     Any_to_Uniform AnyDate, Dnum
     IntDate = Int(Dnum)  'Convert date-time to hold date component only
     DAYOFWEEK_Ext = PosMod(IntDate + Phase, 7) + Start
+End Function
+
+Function GREGORIAN_EPACT(ByVal Year) As Integer 'Gregorian epact computed after the Milesian method www.calendriermilesien.org
+Attribute GREGORIAN_EPACT.VB_Description = "Epact in the Gregorian sense for the given year"
+    Dim S As Integer 'Components of year 'N As Long 
+    If Year <> Int(Year) Or Year < LowYear Or Year > HighYear Then Err.Raise 1
+    S = PosDiv (Year, 100) 'Milesian_IntegDiv Year, 100, S, N   'Decompose Year in centuries (S) + years in century (N)
+    GREGORIAN_EPACT = PosMod ((8 + 11 * PosMod(Year, 19) - S + S \ 4 + (8 * S + 13) \ 25), 30) 'Epact.
+End Function
+
+Function MILESIAN_EPACT(ByVal Year) As Integer 'The Gregorian epact shifted to begin of Milesian year
+Attribute MILESIAN_EPACT.VB_Description = "The moon age computed from the Gregorian epact, one day before Milesian new year"
+    MILESIAN_EPACT = PosMod(GREGORIAN_EPACT(Year) - 11,  30)
 End Function
 
 Function EASTER_SUNDAY(ByVal Year) As Date 'Easter Date computed after the Milesian method www.calendriermilesien.org
