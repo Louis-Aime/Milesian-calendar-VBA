@@ -1,7 +1,7 @@
 # Milesian-calendar-VBA
 Excel VBA functions for Milesian calendar computations
 
-Copyright (c) Miletus, Louis-Aimé de Fouquières, 2017-2019
+Copyright (c) Miletus, Louis-Aimé de Fouquières, 2017-2020
 
 MIT licence applies
 
@@ -104,6 +104,13 @@ The day of the week for the Date, with another default option.
 * Option: a number; default or 0 means 0 = Sunday, Monday = 1, etc., Saturday = 6; 
 1 is Excel's DAYOFWEEK's default option meaning 1 = Sunday, 2 = Monday, etc., Saturday = 7;
 2, 3, 11 to 17, are the same as Excel's DAYOFWEEK's options.
+
+### GREGORIAN_EPACT (Year)
+The Gregorian Epact, i.e. the Ecclesiastic Moon age the eve of 1 March (and of 1 January of a "Julian" Year, i.e. a year of 365,25 days).
+THe Gregorian Epact is an integer number in the range 0 to 29 inclusive. The date of Easter is computed after this number.
+
+### MILESIAN_EPACT (Year)
+The Gregorian Epact shifted to the eve of 1 1m. Always (Gregorian_Epact - 11) modulo 30.
 
 ### EASTER_SUNDAY (Year)
 The day of Easter under Gregorian computus.
