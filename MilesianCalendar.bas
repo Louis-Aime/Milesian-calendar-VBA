@@ -1,6 +1,6 @@
 Attribute VB_Name = "MilesianCalendar"
 'MilesianCalendar: Enter and display dates in Microsoft Excel following Milesian calendar conventions
-'Copyright Miletus SARL 2016-2019. www.calendriermilesien.org
+'Copyright Miletus SARL 2016-2021. www.calendriermilesien.org
 'For use as an MS Excel VBA module.
 'Developped under Excel 2016
 'Tested under MS Excel 2007 (Windows) and 2016 (Windows and MacOS)
@@ -12,14 +12,15 @@ Attribute VB_Name = "MilesianCalendar"
 'Public function include:
 '   MILESIAN_DATE(Year, Month, Day): the Date object correponding to the Milesian date of parameters.
 '   MILESIAN_YEAR, MILESIAN_MONTH, MILESIAN_DAY, MILESIAN_TIME: same as standard YEAR, MONTH, DAY, TIME with Milesian components.
-'   MILESIAN_DISPLAY: display a date in Milesian. Set second parameter (Wtime) to False to discard time part.
+'   MILESIAN_DISPLAY(Date, Wtime): display a date in Milesian. By default, time part is only displayed if non zero. Optional Wtime gives complete control on time part display
+                'Set Wtime to true if you want a time part even with an integer value of Date counter.
 '   DURATION: Duration between two dates, in decimal days.
 '   DATE_SHIFT: Date shifted by a duration.
 '   MILESIAN_MONTH_SHIFT, MILESIAN_MONTH_END: same as standard, with Milesian months
 '   MILESIAN_IS_LONG_YEAR(Year): Boolean, true if the Milesian Year is long i.e. just before a Gregorian leap year.
 '   MILESIAN_YEAR_BASE(Year): the day just before 1 1m Year, used for Doomsday and Milesian epact.
-'       MILESIAN_EPACT(Year): the Milesian epact of the year, rounded to nearest half-integer value
-'       MILESIAN_DOOMSDAY(Year): the Doomsday (clavedi), key day of week for this Milesian and Gregorian year
+'   MILESIAN_EPACT(Year): the Gregorian epact of the year minus 11 modulo 30, an integer value.
+'   MILESIAN_DOOMSDAY(Year): the Doomsday (clavedi), key day of week for this Milesian and Gregorian year
 '   JULIAN_EPOCH_COUNT: Decimal Julian Day from a date expression
 '   JULIAN_EPOCH_DATE: Date from a Julian Day
 'Two special moon functions
@@ -33,23 +34,26 @@ Attribute VB_Name = "MilesianCalendar"
 '       Second paramater is 0 by default, and yields: 0:Sunday to 6: Saturday instead of 1 to 7.
 '       Other value of the second parameter give the same result as DAYOFWEEK.
 '   EASTER_SUNDAY(Year): Date of Easter in the Gregorian calendar, for any year > 1582.
-'Version V2 M2018-02-10
-    ' A special function, MICROSOFT_DATE_TIME_FIX, is used for converting Date objects from textual date-time expression before 30 Dec 1899.
+'Version V6 M2021-01-21
+        'MILESIAN_YEAR_BASE is an integer figure, the day before 1 1m of milesian year as paramater
+        'MILESIAN_DISPLAY: Wtime specifies if user want time part even for integer values of parameter
+'Version V5 M2020-12-01
+        'Add GREGORIAN_EPACT, the conventional epact computed under Gregorian rules
+        'Change MILESIAN_EPACT: give Gregorian epact shifted to begin of Milesian year
+'Version V4 M2019-06-28
+    'In all cases, including Date1904, translation to Date object is made effectively - MS dates 1900-01-01 to 1900-02-29 are considered false.
+    'Add MILESIAN_EPACT and MILESIAN_DOOMSDAY
+    'Change YEAR_BASE to the day before 1 1m at 7:30
+    'Move moon routines into this module.
 'Version V3 M2019-06-13
     'Solar intercalation is Gregorian (no 3200 years cycle)
     'Excel Date object is considered with its special properties for values before 30/12/1899.
     'MICROSOFT_DATE_TIME_FIX suppressed
     'Change management of Date1904: Object Date results shall always be in MacOS count, and any result < 0 raises an error.
-'Version V4 M2019-06-28
     'Change control of Date parameters in such a way that they are always properly converted, even with Date1904.
     'Utilities functions are not visible anymore.
-    'In all cases, including Date1904, translation to Date object is made effectively - MS dates 1900-01-01 to 1900-02-29 are considered false.
-    'Add MILESIAN_EPACT and MILESIAN_DOOMSDAY
-    'Change YEAR_BASE to the day before 1 1m at 7:30
-    'Move moon routines into this module.
-'Version V5 M2020-12-01
-	'Add GREGORIAN_EPACT, the conventional epact computed under Gregorian rules
-	'Change MILESIAN_EPACT: give Gregorian epact shifted to begin of Milesian year
+'Version V2 M2018-02-10
+    ' A special function, MICROSOFT_DATE_TIME_FIX, is used for converting Date objects from textual date-time expression before 30 Dec 1899.
 
 Const MStoPresentEra As Long = 693969 'Offset between 1/1m/0 and Microsoft origin (1899-12-30T00:00:00 is 0)
 Const MStoJulianMinus05 As Long = 2415018 'Offset between julian day epoch and Microsoft origin, minus 0.5
@@ -62,42 +66,42 @@ Const MeanNewMoon2000 As Double = 36531.59773 'G2000-01-06T14-20-44 TT, conventi
 
 '#Part 1: internal procedures
 Sub Milesian_IntegDiv(ByVal Dividend As Variant, ByVal Divisor As Long, Cycle As Long, Phase As Variant)
-'Quotient and modulo in the same operation. Divisor shall by positive.
-'Cycle (i.e. Quotient) is same sign as Dividend. 0 <= Phase (i.e. modulo) < Divisor.
-Cycle = 0
-Phase = Dividend
-If Divisor > 0 Then
-  While Phase < 0
-    Phase = Phase + Divisor
-    Cycle = Cycle - 1
-    Wend
-  While Phase >= Divisor
-    Phase = Phase - Divisor
-    Cycle = Cycle + 1
-    Wend
-Else
-  Err.Raise 1
-End If
+        'Quotient and modulo in the same operation. Divisor shall by positive.
+        'Cycle (i.e. Quotient) is same sign as Dividend. 0 <= Phase (i.e. modulo) < Divisor.
+        Cycle = 0
+        Phase = Dividend
+        If Divisor > 0 Then
+          While Phase < 0
+                Phase = Phase + Divisor
+                Cycle = Cycle - 1
+                Wend
+          While Phase >= Divisor
+                Phase = Phase - Divisor
+                Cycle = Cycle + 1
+                Wend
+        Else
+          Err.Raise 1
+        End If
 End Sub
 
 Sub Milesian_IntegDivCeiling(ByVal Dividend As Variant, ByVal Divisor As Long, ByVal ceiling As Integer, Cycle As Long, Phase As Variant)
-'Quotient and modulo in the same operation. By exception, remainder may be = divisor if quotient = ceiling
-'Cycle (i.e. Quotient) is same sign as Dividend. 0 <= Phase (i.e. modulo) <= Divisor.
-Cycle = 0
-Phase = Dividend
-If Divisor > 0 And Dividend >= 0 And Dividend <= ceiling * Divisor + 1 Then
-  ceiling = ceiling - 1 'Decrease ceiling by 1 in order to simplify test in the next loop
-  While (Phase >= Divisor) And Cycle < ceiling
-    Phase = Phase - Divisor
-    Cycle = Cycle + 1
-    Wend
-Else
-  Err.Raise 1
-End If
+        'Quotient and modulo in the same operation. By exception, remainder may be = divisor if quotient = ceiling
+        'Cycle (i.e. Quotient) is same sign as Dividend. 0 <= Phase (i.e. modulo) <= Divisor.
+        Cycle = 0
+        Phase = Dividend
+        If Divisor > 0 And Dividend >= 0 And Dividend <= ceiling * Divisor + 1 Then
+          ceiling = ceiling - 1 'Decrease ceiling by 1 in order to simplify test in the next loop
+          While (Phase >= Divisor) And Cycle < ceiling
+                Phase = Phase - Divisor
+                Cycle = Cycle + 1
+                Wend
+        Else
+          Err.Raise 1
+        End If
 End Sub
 
 Private Function PosDiv(ByVal A, D)  'The Integer division with positive remainder
-PosDiv = 0
+  PosDiv = 0
   If D <= 0 Then
     Err.Raise 1
   Else
@@ -143,46 +147,37 @@ End Function
 ' TS = - 2*Int(-MTS)-MTS
 'Note that -1 < MTS < 0 is not possible
 
-Sub Any_to_Date(TheNum As Variant, MyDate As Date)
-' Internal procedure (not visible function) that converts any expression TheNum into the VBA Date object MyDate
-MyDate = TheNum     'Force conversion to Date, which is enough for most situations
-If ActiveWorkbook.Date1904 Then
-    If Not IsDate(TheNum) Then MyDate = TheNum + DayOffsetMacOS
-    If IsDate(TheNum) And TheNum > -1 And TheNum < 1 Then MyDate = TheNum + DayOffsetMacOS 'Special ill-handled date
-End If
-End Sub
-
 Sub Any_to_Uniform(ThePossibleDate As Variant, TheNum As Double)
 ' ThePossibleDate: anything expressing a date in the context of the sheet.
 ' TheNum is the Date number as a "uniform" numeric object, i.e. time part is always the decimal positive part of the number representing a date
-Dim TheDate As Date
-' 1. Convert into the right date object
-TheDate = ThePossibleDate    'Force conversion into Date object
-If ActiveWorkbook.Date1904 Then
-    If Not IsDate(ThePossibleDate) Then TheDate = ThePossibleDate + DayOffsetMacOS
-    If IsDate(ThePossibleDate) And ThePossibleDate > -1 And ThePossibleDate < 1 Then TheDate = ThePossibleDate + DayOffsetMacOS 'Special 1/1/1904
-End If
-' 2. Convert into a uniform double expression
-If TheDate >= 0 Then
-    TheNum = TheDate
-Else
-    If TheDate > -1 Then Err.Raise 1, , "Invalid counter" 'No value in ]-1, 0[
-    TheNum = -2 * Int(-TheDate) - TheDate
-End If
+        Dim TheDate As Date
+        ' 1. Convert into the right date object
+        TheDate = ThePossibleDate    'Force conversion into Date object
+        If ActiveWorkbook.Date1904 Then
+                If Not IsDate(ThePossibleDate) Then TheDate = ThePossibleDate + DayOffsetMacOS
+                If IsDate(ThePossibleDate) And ThePossibleDate > -1 And ThePossibleDate < 1 Then TheDate = ThePossibleDate + DayOffsetMacOS 'Special 1/1/1904
+        End If
+        ' 2. Convert into a uniform double expression
+        If TheDate >= 0 Then
+                TheNum = TheDate
+        Else
+                If TheDate > -1 Then Err.Raise 1, , "Invalid counter" 'No value in ]-1, 0[
+                TheNum = -2 * Int(-TheDate) - TheDate
+        End If
 End Sub
 
 Private Function Standard_to_MS_Date(SDate As Double) As Date
 'Back to a date expression after a computation on a uniform date counter
-Dim Mac As Double
-'2019:  Setting MacOS offset is necessary only if calling function is used in a cell's formula or alone.
-'       If calling function is called within a VBA routine, add immediately DayOffsetMacOS to result.
-Mac = 0
-If ActiveWorkbook.Date1904 Then Mac = -DayOffsetMacOS
-If SDate >= 0 Then
-    Standard_to_MS_Date = SDate + Mac
-Else
-    Standard_to_MS_Date = 2 * Int(SDate) - SDate + Mac
-End If
+        Dim Mac As Double
+        '2019:  Setting MacOS offset is necessary only if calling function is used in a cell's formula or alone.
+        '       If calling function is called within a VBA routine, add immediately DayOffsetMacOS to result.
+        Mac = 0
+        If ActiveWorkbook.Date1904 Then Mac = -DayOffsetMacOS
+        If SDate >= 0 Then
+                Standard_to_MS_Date = SDate + Mac
+        Else
+                Standard_to_MS_Date = 2 * Int(SDate) - SDate + Mac
+        End If
 End Function
 
 '#Part 2: Compute date from milesian parameters
@@ -207,9 +202,7 @@ If Year >= LowYear And Year <= HighYear And Month > 0 And Month < 13 And DayInMo
     A = PosDiv(D, 4) - PosDiv(D, 100) + PosDiv(D, 400) 'Sum non-long terms: leap days
     D = D * 365      'Begin computation of days in long-integer;
     D = D - MStoPresentEra - 1 + B * 61 + M1 * 30 + A + DayInMonth 'Computations in long-integer first
-    If ActiveWorkbook.Date1904 Then
-        D = D - DayOffsetMacOS
-        End If
+    If ActiveWorkbook.Date1904 Then D = D - DayOffsetMacOS   'Since date is integer, this conversion is enough
     MILESIAN_DATE = D
   Else
     Err.Raise 1, , "Invalid date"
@@ -281,12 +274,13 @@ Milesian_DateElement TheDate, Y, M, Q, T   'Compute the figures of the milesian 
 MILESIAN_TIME = T
 End Function
 
-Function MILESIAN_DISPLAY(TheDate As Variant, Optional Wtime As Boolean = True) As String
-Attribute MILESIAN_DISPLAY.VB_Description = "Date & time string representing a Milesian date, from a date expression. Set Wtime to 'False' to drop time component."
+Function MILESIAN_DISPLAY(TheDate As Variant, Optional Wtime As Variant) As String
+Attribute MILESIAN_DISPLAY.VB_Description = "Date string representing a Milesian date. Time part displayed only if non zero, or controlled with Wtime."
 'Milesian date as a string, from a Date element
-Dim Y As Integer, M As Integer, Q As Integer, T As Date 'Force T to a date, i.e. a time since < 1
+Dim Y As Integer, M As Integer, Q As Integer, T As Date 'Force T to a date, i.e. a time since 0 <= T < 1
 Milesian_DateElement TheDate, Y, M, Q, T   'Compute the figures of the milesian date
 MILESIAN_DISPLAY = Q & " " & M & "m " & Y
+If IsMissing(Wtime) Then Wtime = Not (T = 0)    'By default, show time part only if not zero
 If Wtime Then MILESIAN_DISPLAY = MILESIAN_DISPLAY & " " & T
 End Function
 
@@ -301,14 +295,14 @@ Any_to_Uniform End_date, End_num
 DURATION = End_num - Begin_num
 End Function
 
-Function DATE_SHIFT(Origin As Variant, TimeShift As Double) As Date
-Attribute DATE_SHIFT.VB_Description = "Elapsed time from Begin to End, in decimal days, can be formatted in hh:mm:ss"
+Function DATE_ADD(Origin As Variant, TimeShift As Double) As Date
+Attribute DATE_ADD.VB_Description = "Decimal date obtained by adding a decimal duration to a decimal date."
 ' Add time in decimal days to a date expression, to obtain a date object.
 ' TimeShift may be negative
 Dim Dnum As Double
 Any_to_Uniform Origin, Dnum
 Dnum = Dnum + TimeShift
-DATE_SHIFT = Standard_to_MS_Date(Dnum)
+DATE_ADD = Standard_to_MS_Date(Dnum)
 End Function
 
 Function MILESIAN_MONTH_SHIFT(TheDate As Variant, MonthShift As Long) As Date 'Same date several (milesian) months later of earlier
@@ -362,17 +356,16 @@ Year = Year + 1
 MILESIAN_IS_LONG_YEAR = PosMod(Year, 4) = 0 And (PosMod(Year, 100) <> 0 Or PosMod(Year, 400) = 0)
 End Function
 
-Function MILESIAN_YEAR_BASE(ByVal Year) As Date 'The Year base of a year i.e. the date just before the 1 1m of the year, at 7:30
-Attribute MILESIAN_YEAR_BASE.VB_Description = "The day before the Milesian new year's day at 7:30 (UTC), where the Milesian epact is computed"
-Dim A As Integer, D As Long, YB As Date
+Function MILESIAN_YEAR_BASE(ByVal Year) As Date 'The Year base of a year i.e. the integer date just before the 1 1m of the year (not anymore at 7:30)
+Attribute MILESIAN_YEAR_BASE.VB_Description = "The day before the Milesian new year's day at 00:00"
+Dim A As Integer, D As Long
 If Year <> Int(Year) Or Year < LowYear Or Year > HighYear Then Err.Raise 1, , "Invalid year"
 D = Year        'Force long-integer conversion
 D = D * 365     'Begin computation of days in long-integer;
 A = PosDiv(Year, 4) - PosDiv(Year, 100) + PosDiv(Year, 400)
 D = D - MStoPresentEra + A - 1           'Computations in long-integer first
-YB = D  'Force Date conversion
-MILESIAN_YEAR_BASE = DATE_SHIFT(YB, 0.3125) 'This day at 7:30 (for moon computations)
-'If ActiveWorkbook.Date1904 Then D = D - DayOffsetMacOS
+If ActiveWorkbook.Date1904 Then D = D - DayOffsetMacOS 'Since date is an integer number, this conversion is enough
+MILESIAN_YEAR_BASE = D  'Force Date conversion
 End Function
 
 Function MILESIAN_DOOMSDAY(ByVal Year, Optional DispType As Integer) As Integer 'The Doomsday for Milesian and also Gregorian year
@@ -486,15 +479,15 @@ End Function
 
 Function GREGORIAN_EPACT(ByVal Year) As Integer 'Gregorian epact computed after the Milesian method www.calendriermilesien.org
 Attribute GREGORIAN_EPACT.VB_Description = "Epact in the Gregorian sense for the given year"
-    Dim S As Integer 'Components of year 'N As Long 
+    Dim S As Integer 'Components of year 'N As Long
     If Year <> Int(Year) Or Year < LowYear Or Year > HighYear Then Err.Raise 1
-    S = PosDiv (Year, 100) 'Milesian_IntegDiv Year, 100, S, N   'Decompose Year in centuries (S) + years in century (N)
-    GREGORIAN_EPACT = PosMod ((8 + 11 * PosMod(Year, 19) - S + S \ 4 + (8 * S + 13) \ 25), 30) 'Epact.
+    S = PosDiv(Year, 100)  'Milesian_IntegDiv Year, 100, S, N   'Decompose Year in centuries (S) + years in century (N)
+    GREGORIAN_EPACT = PosMod((8 + 11 * PosMod(Year, 19) - S + S \ 4 + (8 * S + 13) \ 25), 30)  'Epact.
 End Function
 
 Function MILESIAN_EPACT(ByVal Year) As Integer 'The Gregorian epact shifted to begin of Milesian year
 Attribute MILESIAN_EPACT.VB_Description = "The moon age computed from the Gregorian epact, one day before Milesian new year"
-    MILESIAN_EPACT = PosMod(GREGORIAN_EPACT(Year) - 11,  30)
+    MILESIAN_EPACT = PosMod(GREGORIAN_EPACT(Year) - 11, 30)
 End Function
 
 Function EASTER_SUNDAY(ByVal Year) As Date 'Easter Date computed after the Milesian method www.calendriermilesien.org
@@ -509,6 +502,6 @@ Attribute EASTER_SUNDAY.VB_Description = "Date of Easter Sunday (Gregorian compu
     R = R - (H + 11 * R) \ 319          'Correction, if Residue is 28 or 29.
     Dnum = DateValue("21/03/" & Year) + 1 + R + (32 - S \ 4 + 2 * S + 2 * B - N - R) Mod 7
     ' From 21 March, add 1 ("Day after Good Saturday") + Residue + days to next Sunday.
-    If ActiveWorkbook.Date1904 Then Dnum = Dnum - DayOffsetMacOS
+    If ActiveWorkbook.Date1904 Then Dnum = Dnum - DayOffsetMacOS        'Simple conversion for an integer date
     EASTER_SUNDAY = Dnum
 End Function

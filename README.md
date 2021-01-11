@@ -63,7 +63,7 @@ If optional Wtime is *true* or missing, time part is added to string.
 * MILESIAN_MONTH_END : works like MONTH.END.
 * MILESIAN_MONTH_SHIFT : works like MONTH.SHIFT.
 
-### DATE_SHIFT
+### DATE_ADD
 Date, the date after a duration
 * StartDate, start date...
 * Shift: a duration in decimal days to add to the date. Target date will be before start date if Shift is negative.
@@ -82,7 +82,7 @@ The Milesian calendar use the Gregorian rules for leap years.
 Remember that by mistake, dates 1/1/1900 to 29/2/1900 are wrong under Microsoft Windows.
 
 ### MILESIAN_YEAR_BASE (Year) 
-Date of the day before the 1 1m of year Y, i.e. the "doomsday", at 7:30 (a.m.) for moon computations.
+Date of the day before the 1 1m of year Y, i.e. the "doomsday", at 00:00
 * Year: the year whose base is to be computed.
 
 ### MILESIAN_DOOMSDAY (Year, Option)

@@ -1,10 +1,10 @@
 Package MilesianCalendar for Excel - M2017-06-15
-Dernière mise à jour M2019-06-30
+Dernière mise à jour M2021-01-21
 
 Modules permettant des actions en langage VBA pour Excel. 
 
 Source rédigé en anglais.
-Auteur: Miletus SARL 2017-2019 (www.calendriermilesien.org).
+Auteur: Miletus SARL 2017-2021 (www.calendriermilesien.org).
 Transformation et adaptation sous réserve de citation de l'auteur.
 Intégration possible dans une offre ou sur un support, sous réserve de citation de l'auteur et du site.
 Testé sur Excel 2016 (Office 365) français, MS Windows et IOS.
@@ -63,6 +63,8 @@ Architecture des modules et fonctionnalité
 ** créer une date à partir des coordonnées jour, mois, année en milésien,
 ** calculs sur les mois et fins de mois,
 ** calcul jour de semaine avec option supplémentaire et pour toute date,
+** calcul de l'épacte
+** calcul du clavedi (doomsday) pour la méthode des jours pivots
 ** calcul du dimanche de Pâques,
 ** calcul sur jour julien
 ** différences entre dates,
